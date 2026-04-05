@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Shunya (Debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=GOOGLE_WEB_CLIENT_ID=182112252228-9n3rivl47a9lnf74lgvnbfr84oim2qhd.apps.googleusercontent.com",
+        "--dart-define=APPLE_SIGN_IN_ENABLED=false"
+      ]
+    },
+    {
+      "name": "Shunya (Debug + iOS Client ID)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=GOOGLE_WEB_CLIENT_ID=182112252228-9n3rivl47a9lnf74lgvnbfr84oim2qhd.apps.googleusercontent.com",
+        "--dart-define=GOOGLE_IOS_CLIENT_ID=YOUR_IOS_CLIENT_ID_HERE",
+        "--dart-define=APPLE_SIGN_IN_ENABLED=false"
+      ]
+    },
+    {
+      "name": "Shunya (Release)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "toolArgs": [
+        "--dart-define=GOOGLE_WEB_CLIENT_ID=182112252228-9n3rivl47a9lnf74lgvnbfr84oim2qhd.apps.googleusercontent.com",
+        "--dart-define=APPLE_SIGN_IN_ENABLED=false"
+      ]
+    },
+    {
+      "name": "Shunya (Profile)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "toolArgs": [
+        "--dart-define=GOOGLE_WEB_CLIENT_ID=182112252228-9n3rivl47a9lnf74lgvnbfr84oim2qhd.apps.googleusercontent.com",
+        "--dart-define=APPLE_SIGN_IN_ENABLED=false"
+      ]
+    }
+  ]
+}
