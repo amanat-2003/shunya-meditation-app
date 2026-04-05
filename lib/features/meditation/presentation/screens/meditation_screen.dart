@@ -220,6 +220,11 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
 
     return PopScope(
       canPop: false, // Disable back button / swipe-to-go-back
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) {
+          _showExitHint();
+        }
+      },
       child: Scaffold(
         backgroundColor: Colors.black,
         body: GestureDetector(
@@ -249,7 +254,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                             fontSize: 72,
                             fontWeight: isBrightMode ? FontWeight.w500 : FontWeight.w200,
                             color: Colors.white.withValues(
-                                alpha: isBrightMode ? 0.90 : 0.06),
+                                alpha: isBrightMode ? 1.0 : 0.06),
                             letterSpacing: 2,
                           ),
                         ),
@@ -260,7 +265,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                             fontSize: 16,
                             fontWeight: isBrightMode ? FontWeight.w400 : FontWeight.w300,
                             color: Colors.white.withValues(
-                                alpha: isBrightMode ? 0.70 : 0.04),
+                                alpha: isBrightMode ? 1.0 : 0.04),
                           ),
                         ),
                   ],
