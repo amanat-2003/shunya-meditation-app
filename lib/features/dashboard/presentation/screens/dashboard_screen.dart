@@ -80,7 +80,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              ref.read(syncStateProvider.notifier).syncAll();
+              ref.read(syncStateProvider.notifier).syncAll(showNotification: true);
             },
             child: const Text('Sync Now'),
           ),

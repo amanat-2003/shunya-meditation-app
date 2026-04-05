@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../meditation/data/services/haptic_service.dart';
 import '../../sync/providers/sync_providers.dart';
 import '../providers/settings_providers.dart';
 
@@ -173,6 +174,8 @@ class SettingsScreen extends ConsumerWidget {
                           onChanged: (value) {
                             if (value != null) {
                               settingsNotifier.setHapticIntensity(value);
+                              // Preview the selected haptic intensity
+                              HapticService.triggerTapFeedback(0, 1, intensity: value);
                             }
                           },
                         ),
@@ -223,39 +226,40 @@ class SettingsScreen extends ConsumerWidget {
                           (settings?.customAudioPath ?? '').isNotEmpty
                               ? 'Custom: ${settings?.customAudioName}'
                               : 'Built-in: ${settings?.activeAudioDisplayName}',
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceElevated,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: DropdownButton<String>(
-                          value: settings?.audioReminderSound ?? 'om',
-                          dropdownColor: AppTheme.surfaceElevated,
-                          underline: const SizedBox(),
-                          style: TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: 14,
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'om',
-                              child: Text('Om'),
+                      trailing: (settings?.customAudioPath ?? '').isNotEmpty
+                          ? null
+                          : Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceElevated,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: DropdownButton<String>(
+                                value: settings?.audioReminderSound ?? 'om',
+                                dropdownColor: AppTheme.surfaceElevated,
+                                underline: const SizedBox(),
+                                style: TextStyle(
+                                  color: AppTheme.textPrimary,
+                                  fontSize: 14,
+                                ),
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'om',
+                                    child: Text('Om'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'waheguru',
+                                    child: Text('Waheguru'),
+                                  ),
+                                ],
+                                onChanged: (value) async {
+                                  if (value != null) {
+                                    await settingsNotifier.setAudioReminderSound(value);
+                                    await settingsNotifier.clearCustomAudio();
+                                  }
+                                },
+                              ),
                             ),
-                            DropdownMenuItem(
-                              value: 'waheguru',
-                              child: Text('Waheguru'),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              settingsNotifier.setAudioReminderSound(value);
-                              // When choosing a built-in sound, clear custom audio
-                              settingsNotifier.clearCustomAudio();
-                            }
-                          },
-                        ),
-                      ),
                     ),
 
                     // Custom audio picker
