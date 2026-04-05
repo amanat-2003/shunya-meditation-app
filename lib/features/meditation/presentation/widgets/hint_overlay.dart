@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 
 class HintOverlay extends StatelessWidget {
-  const HintOverlay({super.key});
+  final bool isBrightMode;
+  
+  const HintOverlay({
+    super.key,
+    this.isBrightMode = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
-      opacity: 0.10,
+      opacity: isBrightMode ? 1.0 : 0.10,
       duration: const Duration(milliseconds: 500),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: Colors.white.withValues(alpha: isBrightMode ? 0.15 : 0.05),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(

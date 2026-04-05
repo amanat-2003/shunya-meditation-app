@@ -38,6 +38,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     // Invalidate cached providers so the UI updates instantly with the new data
     ref.invalidate(userSessionsProvider);
     ref.invalidate(todayTapsProvider);
+    ref.invalidate(todayTimeSecondsProvider);
     ref.invalidate(lifetimeTapsProvider);
     ref.invalidate(currentStreakProvider);
     ref.invalidate(userSettingsProvider);
@@ -108,12 +109,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final user = ref.watch(currentUserProvider);
     final settings = ref.watch(userSettingsProvider);
     final todayTaps = ref.watch(todayTapsProvider);
+    final todaySeconds = ref.watch(todayTimeSecondsProvider);
     final lifetimeTaps = ref.watch(lifetimeTapsProvider);
     final streak = ref.watch(currentStreakProvider);
     final syncState = ref.watch(syncStateProvider);
+    
     final dailyGoal = settings?.dailyTapGoal ?? 1080;
+    final timeGoalSeconds = settings?.dailyTimeGoalSeconds ?? 600;
 
     final goalPercent = dailyGoal > 0 ? (todayTaps / dailyGoal).clamp(0.0, 1.0) : 0.0;
+    
+    final todayMins = todaySeconds ~/ 60;
+    final goalMins = timeGoalSeconds ~/ 60;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -245,12 +252,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '$todayTaps / $dailyGoal',
+                                  '$todayTaps / $dailyGoal taps',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: AppTheme.textMuted,
                                   ),
                                 ),
+                                if (timeGoalSeconds > 0)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Text(
+                                      '${todayMins}m / ${goalMins}m',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppTheme.primaryGold.withValues(alpha: 0.8),
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ],

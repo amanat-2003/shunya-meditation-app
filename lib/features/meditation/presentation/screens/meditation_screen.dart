@@ -225,21 +225,20 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
           onLongPressEnd: _onLongPressEnd,
           behavior: HitTestBehavior.opaque,
           child: SizedBox.expand(
-            child: Column(
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                // Hint overlay — shown ABOVE the counter in a column
+                // Hint overlay — Absolute positioned at top
                 if (_showHint)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 80),
-                    child: HintOverlay(),
+                  Positioned(
+                    top: 80,
+                    child: HintOverlay(isBrightMode: isBrightMode),
                   ),
 
                 // Main content
-                Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                         // Tap count
                         Text(
                           '$_tapCount',
@@ -261,16 +260,15 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                                 alpha: isBrightMode ? 0.70 : 0.04),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
 
                 // Exit progress indicator
                 if (_isLongPressing)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 60),
+                  Positioned(
+                    bottom: 60,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(
                           width: 120,

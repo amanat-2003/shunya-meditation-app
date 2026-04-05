@@ -59,6 +59,15 @@ final todayTapsProvider = Provider<int>((ref) {
   return todaySessions.fold<int>(0, (sum, s) => sum + s.totalTaps);
 });
 
+/// Provides today's meditated time in seconds
+final todayTimeSecondsProvider = Provider<int>((ref) {
+  final repo = ref.watch(meditationRepositoryProvider);
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return 0;
+  final todaySessions = repo.getTodaySessions(user.id);
+  return todaySessions.fold<int>(0, (sum, s) => sum + s.durationSeconds);
+});
+
 /// Provides lifetime taps
 final lifetimeTapsProvider = Provider<int>((ref) {
   final repo = ref.watch(meditationRepositoryProvider);
