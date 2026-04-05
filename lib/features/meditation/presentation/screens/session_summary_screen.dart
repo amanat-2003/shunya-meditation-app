@@ -64,22 +64,27 @@ class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen>
     final syncState = ref.watch(syncStateProvider);
 
     if (session == null) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Text(
-            'Session not found',
-            style: TextStyle(color: AppTheme.textMuted),
+      return PopScope(
+        canPop: false,
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: Text(
+              'Session not found',
+              style: TextStyle(color: AppTheme.textMuted),
+            ),
           ),
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
           child: Column(
             children: [
               const SizedBox(height: 40),
@@ -219,6 +224,7 @@ class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen>
             ],
           ),
         ),
+      ),
       ),
     );
   }

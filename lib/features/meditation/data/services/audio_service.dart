@@ -53,7 +53,8 @@ class AudioService {
 
       await _loopPlayer!.setLoopMode(LoopMode.one); // Infinite loop
       await _loopPlayer!.setVolume(0.5);
-      await _loopPlayer!.play();
+      // DO NOT await play() on an infinite loop, it will block execution forever
+      _loopPlayer!.play();
     } catch (_) {
       // Silently fail — don't disrupt meditation
     }
