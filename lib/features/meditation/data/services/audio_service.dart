@@ -52,7 +52,7 @@ class AudioService {
       }
 
       await _loopPlayer!.setLoopMode(LoopMode.one); // Infinite loop
-      await _loopPlayer!.setVolume(0.5);
+      await _loopPlayer!.setVolume(1.0); // Full capacity
       // DO NOT await play() on an infinite loop, it will block execution forever
       _loopPlayer!.play();
     } catch (_) {

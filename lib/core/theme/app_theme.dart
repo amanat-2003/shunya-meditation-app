@@ -157,12 +157,15 @@ class AppTheme {
         hintStyle: const TextStyle(color: textMuted, fontSize: 14),
         labelStyle: const TextStyle(color: textSecondary, fontSize: 14),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: surfaceDark,
-        selectedItemColor: primaryGold,
-        unselectedItemColor: textMuted,
-        type: BottomNavigationBarType.fixed,
-        elevation: 0,
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surfaceElevated,
+        indicatorColor: primaryGold.withValues(alpha: 0.15),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(color: primaryGold, fontSize: 12, fontWeight: FontWeight.w600);
+          }
+          return const TextStyle(color: textSecondary, fontSize: 12, fontWeight: FontWeight.w500);
+        }),
       ),
       dividerTheme: const DividerThemeData(
         color: dividerColor,

@@ -128,14 +128,31 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
   void _showSyncFailureNotification(String message) {
     final messenger = syncScaffoldMessengerKey.currentState;
     if (messenger != null) {
+      messenger.clearSnackBars(); // Ensure old snackbars don't pile up and freeze the UI
       messenger.showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Row(
+            children: [
+              const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
+          ),
           backgroundColor: const Color(0xFFE57373),
           behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 4),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 6,
+          duration: const Duration(seconds: 3),
           action: SnackBarAction(
-            label: 'Retry',
+            label: 'RETRY',
             textColor: Colors.white,
             onPressed: () => syncAll(showNotification: true),
           ),

@@ -17,20 +17,20 @@ class ShellScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: AppTheme.dividerColor,
-              width: 0.5,
-            ),
-          ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex(context),
-          onTap: (index) {
+    final currentIndex = _currentIndex(context);
+
+    return PopScope(
+      canPop: currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && currentIndex != 0) {
+          context.go('/');
+        }
+      },
+      child: Scaffold(
+        body: child,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: currentIndex,
+          onDestinationSelected: (index) {
             switch (index) {
               case 0:
                 context.go('/');
@@ -43,20 +43,25 @@ class ShellScaffold extends StatelessWidget {
                 break;
             }
           },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              activeIcon: Icon(Icons.home_rounded),
+          backgroundColor: AppTheme.surfaceElevated,
+          indicatorColor: AppTheme.primaryGold.withValues(alpha: 0.2),
+          surfaceTintColor: Colors.transparent,
+          height: 68,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined, color: AppTheme.textSecondary),
+              selectedIcon: Icon(Icons.home_rounded, color: AppTheme.primaryGold),
               label: 'Home',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.insights_rounded),
-              activeIcon: Icon(Icons.insights_rounded),
+            NavigationDestination(
+              icon: Icon(Icons.insights_outlined, color: AppTheme.textSecondary),
+              selectedIcon: Icon(Icons.insights_rounded, color: AppTheme.primaryGold),
               label: 'Stats',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings_rounded),
-              activeIcon: Icon(Icons.settings_rounded),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined, color: AppTheme.textSecondary),
+              selectedIcon: Icon(Icons.settings_rounded, color: AppTheme.primaryGold),
               label: 'Settings',
             ),
           ],
