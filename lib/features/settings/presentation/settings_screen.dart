@@ -183,6 +183,26 @@ class SettingsScreen extends ConsumerWidget {
                     ),
 
                     const SizedBox(height: 4),
+                    _SectionTitle('Display'),
+                    const SizedBox(height: 12),
+
+                    // Bright mode toggle
+                    _SettingsCard(
+                      icon: Icons.brightness_high_rounded,
+                      title: 'Bright UI Mode',
+                      subtitle: settings?.brightModeEnabled == true
+                          ? 'Tap counter and time shown brightly'
+                          : 'Tap counter and time subtly dimmed',
+                      trailing: Switch(
+                        value: settings?.brightModeEnabled ?? true,
+                        activeTrackColor: AppTheme.primaryGold,
+                        onChanged: (value) {
+                          settingsNotifier.setBrightModeEnabled(value);
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
                     _SectionTitle('Audio'),
                     const SizedBox(height: 12),
 

@@ -23,13 +23,14 @@ class UserSettingsModelAdapter extends TypeAdapter<UserSettingsModel> {
       continuousAudioEnabled: fields[6] as bool? ?? false,
       customAudioPath: fields[7] as String? ?? '',
       customAudioName: fields[8] as String? ?? '',
+      brightModeEnabled: fields[9] as bool? ?? true,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserSettingsModel obj) {
     writer
-      ..writeByte(9) // number of fields
+      ..writeByte(10) // number of fields
       ..writeByte(0)
       ..write(obj.dailyTapGoal)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class UserSettingsModelAdapter extends TypeAdapter<UserSettingsModel> {
       ..writeByte(7)
       ..write(obj.customAudioPath)
       ..writeByte(8)
-      ..write(obj.customAudioName);
+      ..write(obj.customAudioName)
+      ..writeByte(9)
+      ..write(obj.brightModeEnabled);
   }
 
   @override

@@ -157,12 +157,6 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     }
   }
 
-  void _onVerticalDragEnd(DragEndDetails details) {
-    if (_exitReady && details.primaryVelocity != null && details.primaryVelocity! < -200) {
-      _endSession();
-    }
-  }
-
   Future<void> _endSession() async {
     // Restore screen
     try {
@@ -219,6 +213,8 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isBrightMode = ref.watch(userSettingsProvider)?.brightModeEnabled ?? true;
+
     return PopScope(
       canPop: false, // Disable back button / swipe-to-go-back
       child: Scaffold(
@@ -227,7 +223,6 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
           onTapDown: _onTapDown,
           onLongPressStart: _onLongPressStart,
           onLongPressEnd: _onLongPressEnd,
-          onVerticalDragEnd: _onVerticalDragEnd,
           behavior: HitTestBehavior.opaque,
           child: SizedBox.expand(
             child: Column(
@@ -239,19 +234,20 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                     child: HintOverlay(),
                   ),
 
-                // Main content — very subtle to not disturb
+                // Main content
                 Expanded(
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Tap count — very dim
+                        // Tap count
                         Text(
                           '$_tapCount',
                           style: TextStyle(
                             fontSize: 72,
-                            fontWeight: FontWeight.w200,
-                            color: Colors.white.withValues(alpha: 0.06),
+                            fontWeight: isBrightMode ? FontWeight.w500 : FontWeight.w200,
+                            color: Colors.white.withValues(
+                                alpha: isBrightMode ? 0.90 : 0.06),
                             letterSpacing: 2,
                           ),
                         ),
@@ -260,8 +256,9 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                           _formatTime(_elapsedSeconds),
                           style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.white.withValues(alpha: 0.04),
+                            fontWeight: isBrightMode ? FontWeight.w400 : FontWeight.w300,
+                            color: Colors.white.withValues(
+                                alpha: isBrightMode ? 0.70 : 0.04),
                           ),
                         ),
                       ],
@@ -291,7 +288,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _exitReady ? 'Release & swipe up' : 'Hold to exit...',
+                          _exitReady ? 'Release to exit' : 'Hold to exit...',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,

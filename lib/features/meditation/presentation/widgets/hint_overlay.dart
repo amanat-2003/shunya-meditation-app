@@ -33,7 +33,7 @@ class HintOverlay extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'Long press 3 seconds\nthen swipe up',
+              'Long press 3 seconds',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,

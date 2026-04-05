@@ -35,6 +35,10 @@ class UserSettingsModel extends HiveObject {
   @HiveField(8)
   String customAudioName;
 
+  /// Whether meditation mode displays text brightly (true) or subtly dim (false)
+  @HiveField(9)
+  bool brightModeEnabled;
+
   UserSettingsModel({
     this.dailyTapGoal = 1080,
     this.dailyTimeGoalSeconds = 600,
@@ -45,6 +49,7 @@ class UserSettingsModel extends HiveObject {
     this.continuousAudioEnabled = true,
     this.customAudioPath = '',
     this.customAudioName = '',
+    this.brightModeEnabled = true,
   });
 
   /// The display name shown in the UI for the current sound
@@ -67,6 +72,7 @@ class UserSettingsModel extends HiveObject {
         'continuous_audio_enabled': continuousAudioEnabled,
         'custom_audio_path': customAudioPath,
         'custom_audio_name': customAudioName,
+        'bright_mode_enabled': brightModeEnabled,
       };
 
   factory UserSettingsModel.fromJson(Map<String, dynamic> json) {
@@ -80,6 +86,7 @@ class UserSettingsModel extends HiveObject {
       continuousAudioEnabled: json['continuous_audio_enabled'] as bool? ?? false,
       customAudioPath: json['custom_audio_path'] as String? ?? '',
       customAudioName: json['custom_audio_name'] as String? ?? '',
+      brightModeEnabled: json['bright_mode_enabled'] as bool? ?? true,
     );
   }
 
@@ -93,6 +100,7 @@ class UserSettingsModel extends HiveObject {
     bool? continuousAudioEnabled,
     String? customAudioPath,
     String? customAudioName,
+    bool? brightModeEnabled,
   }) {
     return UserSettingsModel(
       dailyTapGoal: dailyTapGoal ?? this.dailyTapGoal,
@@ -104,6 +112,7 @@ class UserSettingsModel extends HiveObject {
       continuousAudioEnabled: continuousAudioEnabled ?? this.continuousAudioEnabled,
       customAudioPath: customAudioPath ?? this.customAudioPath,
       customAudioName: customAudioName ?? this.customAudioName,
+      brightModeEnabled: brightModeEnabled ?? this.brightModeEnabled,
     );
   }
 }

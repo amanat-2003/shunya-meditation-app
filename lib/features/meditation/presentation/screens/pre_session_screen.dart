@@ -225,7 +225,7 @@ class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'To exit meditation: Long press 3 sec → Swipe up',
+                        'To exit meditation: Long press 3 seconds',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppTheme.textMuted,

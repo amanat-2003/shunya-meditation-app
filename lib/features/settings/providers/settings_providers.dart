@@ -117,6 +117,12 @@ class UserSettingsNotifier extends StateNotifier<UserSettingsModel?> {
     await updateSettings(updated);
   }
 
+  Future<void> setBrightModeEnabled(bool enabled) async {
+    final current = state ?? UserSettingsModel();
+    final updated = current.copyWith(brightModeEnabled: enabled);
+    await updateSettings(updated);
+  }
+
   Future<void> setCustomAudio(String path, String name) async {
     final current = state ?? UserSettingsModel();
     final updated = current.copyWith(
