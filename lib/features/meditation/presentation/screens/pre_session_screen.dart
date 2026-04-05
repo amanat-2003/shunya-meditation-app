@@ -124,16 +124,16 @@ class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
                 icon: Icons.do_not_disturb_on_rounded,
                 title: 'Enable Do Not Disturb',
                 subtitle: Platform.isIOS
-                    ? 'Opens Focus settings'
-                    : 'Opens notification settings',
+                    ? 'Opens Settings'
+                    : 'Opens sound & vibration settings',
                 onTap: () {
                   if (Platform.isAndroid) {
                     AppSettings.openAppSettings(
-                      type: AppSettingsType.notification,
+                      type: AppSettingsType.sound,
                     );
                   } else {
                     AppSettings.openAppSettings(
-                      type: AppSettingsType.notification,
+                      type: AppSettingsType.settings,
                     );
                   }
                 },

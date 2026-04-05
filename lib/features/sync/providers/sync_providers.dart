@@ -150,12 +150,7 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 6,
-          duration: const Duration(seconds: 3),
-          action: SnackBarAction(
-            label: 'RETRY',
-            textColor: Colors.white,
-            onPressed: () => syncAll(showNotification: true),
-          ),
+          duration: const Duration(seconds: 2),
         ),
       );
     }

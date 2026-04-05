@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../sync/providers/sync_providers.dart';
 
 class AudioService {
   AudioPlayer? _player;
@@ -45,9 +47,21 @@ class AudioService {
     try {
       await _loopPlayer!.stop();
 
-      if (customAudioPath.isNotEmpty && File(customAudioPath).existsSync()) {
-        await _loopPlayer!.setFilePath(customAudioPath);
-      } else {
+      bool usedCustom = false;
+      if (customAudioPath.isNotEmpty) {
+        if (File(customAudioPath).existsSync()) {
+          try {
+            await _loopPlayer!.setFilePath(customAudioPath);
+            usedCustom = true;
+          } catch (e) {
+            _notifyCustomAudioFailure();
+          }
+        } else {
+          _notifyCustomAudioFailure();
+        }
+      }
+
+      if (!usedCustom) {
         await _loopPlayer!.setAsset('assets/audio/$soundName.mp3');
       }
 
@@ -79,9 +93,23 @@ class AudioService {
   Future<void> _playSound() async {
     if (_player == null) return;
     try {
-      if (_customAudioPath.isNotEmpty && File(_customAudioPath).existsSync()) {
-        await _player!.setFilePath(_customAudioPath);
-      } else {
+      bool usedCustom = false;
+      if (_customAudioPath.isNotEmpty) {
+        if (File(_customAudioPath).existsSync()) {
+          try {
+            await _player!.setFilePath(_customAudioPath);
+            usedCustom = true;
+          } catch (e) {
+            _notifyCustomAudioFailure();
+            _customAudioPath = ''; // clear it so we don't repeatedly fail on reminders
+          }
+        } else {
+          _notifyCustomAudioFailure();
+          _customAudioPath = '';
+        }
+      }
+
+      if (!usedCustom) {
         await _player!.setAsset('assets/audio/$_soundName.mp3');
       }
       await _player!.setVolume(0.7);
@@ -105,5 +133,26 @@ class AudioService {
     await _player?.dispose();
     _player = null;
     _loopPlayer = null;
+  }
+
+  /// Notify user if custom audio is corrupt or missing
+  void _notifyCustomAudioFailure() {
+    final messenger = syncScaffoldMessengerKey.currentState;
+    if (messenger != null) {
+      messenger.clearSnackBars();
+      messenger.showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Custom audio file not found or corrupted. Using default sound.',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFFE57373),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 }
