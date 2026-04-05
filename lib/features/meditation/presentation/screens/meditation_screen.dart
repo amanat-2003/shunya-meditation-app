@@ -44,13 +44,18 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
   }
 
   Future<void> _initMeditationMode() async {
+    final settings = ref.read(userSettingsProvider);
+    final isBrightMode = settings?.brightModeEnabled ?? true;
+
     // Enable wakelock
     await WakelockPlus.enable();
 
-    // Set minimum brightness
-    try {
-      await ScreenBrightness().setScreenBrightness(0.01);
-    } catch (_) {}
+    // Set minimum brightness ONLY if bright UI mode is logically disabled
+    if (!isBrightMode) {
+      try {
+        await ScreenBrightness().setScreenBrightness(0.01);
+      } catch (_) {}
+    }
 
     // Hide system UI — fully immersive, hides all bars and prevents pull-down
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -58,8 +63,6 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     // Start the service
     final meditationService = ref.read(meditationServiceProvider);
     await meditationService.startSession();
-
-    final settings = ref.read(userSettingsProvider);
 
     // Start audio reminders if enabled
     final audioService = ref.read(audioServiceProvider);
