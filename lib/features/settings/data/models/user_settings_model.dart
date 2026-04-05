@@ -42,7 +42,7 @@ class UserSettingsModel extends HiveObject {
     this.audioReminderEnabled = false,
     this.audioReminderSound = 'om',
     this.hapticIntensity = 'light',
-    this.continuousAudioEnabled = false,
+    this.continuousAudioEnabled = true,
     this.customAudioPath = '',
     this.customAudioName = '',
   });

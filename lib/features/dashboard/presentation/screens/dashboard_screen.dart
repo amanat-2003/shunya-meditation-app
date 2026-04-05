@@ -22,20 +22,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Check for pending sessions on launch
+    // Initialize data on launch
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkPendingSessions();
+      _initializeDashboard();
     });
   }
 
-  Future<void> _checkPendingSessions() async {
+  Future<void> _initializeDashboard() async {
     final syncNotifier = ref.read(syncStateProvider.notifier);
+    final userId = ref.read(currentUserProvider)?.id;
+
+    // 1. If fresh install, aggressively sync down data from cloud FIRST
+    await syncNotifier.syncDownIfFreshInstall(userId);
+
+    // 2. Check for offline sessions pending upload
     final hasPending = await syncNotifier.hasPendingSessions();
     if (hasPending && mounted) {
       _showPendingSessionDialog();
     }
-    // Also try to sync
-    syncNotifier.syncAll();
+    
+    // 3. Attempt background sync up
+    syncNotifier.syncAll(showNotification: false);
   }
 
   void _showPendingSessionDialog() {

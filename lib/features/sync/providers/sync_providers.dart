@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../meditation/providers/meditation_providers.dart';
+import '../../settings/providers/settings_providers.dart';
 
 /// Global key for showing sync failure snackbars from anywhere
 final syncScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -66,6 +67,40 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
         syncAll(showNotification: false);
       }
     });
+  }
+
+  /// Sync DOWN data from Supabase if this is a fresh install sign-in
+  Future<void> syncDownIfFreshInstall(String? userId) async {
+    if (userId == null) return;
+    
+    final repo = _ref.read(meditationRepositoryProvider);
+    final settingsNotifier = _ref.read(userSettingsProvider.notifier);
+
+    // Only restore if the local sessions box is completely empty
+    final localSessions = repo.getLocalSessions();
+    if (localSessions.isEmpty) {
+      state = state.copyWith(isSyncing: true);
+      
+      try {
+        // Restore Settings
+        final remoteSettings = await settingsNotifier.fetchRemoteSettings();
+        if (remoteSettings != null) {
+          await settingsNotifier.updateSettings(remoteSettings);
+        }
+
+        // Restore Sessions
+        final remoteSessions = await repo.fetchRemoteSessions(userId);
+        for (final session in remoteSessions) {
+          // Force sync status to synced so we don't accidentally push them back
+          session.syncStatus = 'synced';
+          await repo.saveSessionLocally(session);
+        }
+      } catch (_) {
+        // Silently fail on network errors
+      } finally {
+        state = state.copyWith(isSyncing: false);
+      }
+    }
   }
 
   /// Sync all pending sessions

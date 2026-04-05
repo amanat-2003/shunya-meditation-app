@@ -57,6 +57,24 @@ class UserSettingsNotifier extends StateNotifier<UserSettingsModel?> {
     }
   }
 
+  Future<UserSettingsModel?> fetchRemoteSettings() async {
+    if (_userId == null || _userId.isEmpty) return null;
+    try {
+      final response = await _supabase
+          .from('user_settings')
+          .select()
+          .eq('user_id', _userId)
+          .maybeSingle();
+      
+      if (response != null) {
+        return UserSettingsModel.fromJson(response);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> setDailyTapGoal(int goal) async {
     final current = state ?? UserSettingsModel();
     final updated = current.copyWith(dailyTapGoal: goal);
