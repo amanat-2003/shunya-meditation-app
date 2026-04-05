@@ -17,8 +17,6 @@ class PreSessionScreen extends ConsumerStatefulWidget {
 
 class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
     with SingleTickerProviderStateMixin {
-  bool _dndChecked = false;
-  bool _airplaneChecked = false;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
@@ -111,9 +109,9 @@ class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
 
               const SizedBox(height: 28),
 
-              // Checklist
+              // Pre-session actions
               Text(
-                'Pre-session Checklist',
+                'Recommended Before Starting',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -122,39 +120,37 @@ class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
               ),
               const SizedBox(height: 14),
 
-              _ChecklistItem(
+              _ActionButton(
                 icon: Icons.do_not_disturb_on_rounded,
                 title: 'Enable Do Not Disturb',
                 subtitle: Platform.isIOS
-                    ? 'Open Control Center → Focus → DND'
-                    : 'Tap to open DND settings',
-                checked: _dndChecked,
+                    ? 'Opens Focus settings'
+                    : 'Opens notification settings',
                 onTap: () {
                   if (Platform.isAndroid) {
                     AppSettings.openAppSettings(
                       type: AppSettingsType.notification,
                     );
+                  } else {
+                    AppSettings.openAppSettings(
+                      type: AppSettingsType.notification,
+                    );
                   }
-                  setState(() => _dndChecked = !_dndChecked);
                 },
               ),
 
               const SizedBox(height: 10),
 
-              _ChecklistItem(
+              _ActionButton(
                 icon: Icons.airplanemode_active_rounded,
                 title: 'Enable Airplane Mode',
                 subtitle: Platform.isIOS
-                    ? 'Open Control Center → Airplane Mode'
-                    : 'Tap to open connectivity settings',
-                checked: _airplaneChecked,
+                    ? 'Opens connectivity settings'
+                    : 'Opens connectivity settings',
                 onTap: () {
-                  if (Platform.isAndroid) {
-                    AppSettings.openAppSettings(
-                      type: AppSettingsType.wireless,
-                    );
-                  }
-                  setState(() => _airplaneChecked = !_airplaneChecked);
+                  AppSettings.openAppSettings(
+                    type: AppSettingsType.wireless,
+                  );
                 },
               ),
 
@@ -285,18 +281,18 @@ class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
   }
 }
 
-class _ChecklistItem extends StatelessWidget {
+/// A simple tappable action button that opens system settings.
+/// No checkbox — just tap to open the relevant settings page.
+class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final bool checked;
   final VoidCallback onTap;
 
-  const _ChecklistItem({
+  const _ActionButton({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.checked,
     required this.onTap,
   });
 
@@ -307,19 +303,12 @@ class _ChecklistItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: checked
-              ? AppTheme.successGreen.withValues(alpha: 0.06)
-              : AppTheme.surfaceCard,
+          color: AppTheme.surfaceCard,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: checked
-                ? AppTheme.successGreen.withValues(alpha: 0.3)
-                : Colors.transparent,
-          ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: checked ? AppTheme.successGreen : AppTheme.textMuted, size: 22),
+            Icon(icon, color: AppTheme.textMuted, size: 22),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -344,20 +333,10 @@ class _ChecklistItem extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: checked ? AppTheme.successGreen : Colors.transparent,
-                border: Border.all(
-                  color: checked ? AppTheme.successGreen : AppTheme.textMuted,
-                  width: 1.5,
-                ),
-              ),
-              child: checked
-                  ? const Icon(Icons.check, color: Colors.black, size: 16)
-                  : null,
+            Icon(
+              Icons.open_in_new_rounded,
+              color: AppTheme.textMuted,
+              size: 18,
             ),
           ],
         ),

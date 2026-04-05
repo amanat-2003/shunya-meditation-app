@@ -52,7 +52,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
       await ScreenBrightness().setScreenBrightness(0.01);
     } catch (_) {}
 
-    // Hide system UI
+    // Hide system UI — fully immersive, hides all bars and prevents pull-down
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     // Start the service
@@ -135,9 +135,6 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     _exitProgressTimer?.cancel();
 
     if (_exitReady) {
-      // Now the user needs to swipe up — but since long press just ended,
-      // we give a small window for detection through the vertical drag
-      // For simplicity, if exitReady is true when long press ends, end session
       _endSession();
     } else {
       setState(() {
@@ -169,6 +166,14 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     final meditationService = ref.read(meditationServiceProvider);
     final session = await meditationService.endSession();
 
+    // Invalidate dashboard providers so they re-read fresh Hive data
+    ref.invalidate(todayTapsProvider);
+    ref.invalidate(lifetimeTapsProvider);
+    ref.invalidate(currentStreakProvider);
+    ref.invalidate(weeklyTapsProvider);
+    ref.invalidate(monthlyFrequencyProvider);
+    ref.invalidate(pendingSessionsCountProvider);
+
     if (mounted && session != null) {
       context.go('/meditate/summary', extra: {'sessionId': session.id});
     } else if (mounted) {
@@ -199,81 +204,88 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: GestureDetector(
-        onTapDown: _onTapDown,
-        onLongPressStart: _onLongPressStart,
-        onLongPressEnd: _onLongPressEnd,
-        onVerticalDragEnd: _onVerticalDragEnd,
-        behavior: HitTestBehavior.opaque,
-        child: SizedBox.expand(
-          child: Stack(
-            children: [
-              // Main content — very subtle to not disturb
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Tap count — very dim
-                    Text(
-                      '$_tapCount',
-                      style: TextStyle(
-                        fontSize: 72,
-                        fontWeight: FontWeight.w200,
-                        color: Colors.white.withValues(alpha: 0.06),
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _formatTime(_elapsedSeconds),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.white.withValues(alpha: 0.04),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+    return PopScope(
+      canPop: false, // Disable back button / swipe-to-go-back
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: GestureDetector(
+          onTapDown: _onTapDown,
+          onLongPressStart: _onLongPressStart,
+          onLongPressEnd: _onLongPressEnd,
+          onVerticalDragEnd: _onVerticalDragEnd,
+          behavior: HitTestBehavior.opaque,
+          child: SizedBox.expand(
+            child: Column(
+              children: [
+                // Hint overlay — shown ABOVE the counter in a column
+                if (_showHint)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 80),
+                    child: HintOverlay(),
+                  ),
 
-              // Exit progress indicator
-              if (_isLongPressing)
-                Positioned(
-                  bottom: 60,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        child: LinearProgressIndicator(
-                          value: _exitProgress,
-                          backgroundColor: Colors.white.withValues(alpha: 0.05),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            _exitReady
-                                ? AppTheme.successGreen.withValues(alpha: 0.5)
-                                : AppTheme.primaryGold.withValues(alpha: 0.3),
+                // Main content — very subtle to not disturb
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Tap count — very dim
+                        Text(
+                          '$_tapCount',
+                          style: TextStyle(
+                            fontSize: 72,
+                            fontWeight: FontWeight.w200,
+                            color: Colors.white.withValues(alpha: 0.06),
+                            letterSpacing: 2,
                           ),
-                          minHeight: 2,
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _exitReady ? 'Release & swipe up' : 'Hold to exit...',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white.withValues(alpha: 0.1),
+                        const SizedBox(height: 8),
+                        Text(
+                          _formatTime(_elapsedSeconds),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white.withValues(alpha: 0.04),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 
-              // Hint overlay
-              if (_showHint) const HintOverlay(),
-            ],
+                // Exit progress indicator
+                if (_isLongPressing)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 60),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          child: LinearProgressIndicator(
+                            value: _exitProgress,
+                            backgroundColor: Colors.white.withValues(alpha: 0.05),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              _exitReady
+                                  ? AppTheme.successGreen.withValues(alpha: 0.5)
+                                  : AppTheme.primaryGold.withValues(alpha: 0.3),
+                            ),
+                            minHeight: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _exitReady ? 'Release & swipe up' : 'Hold to exit...',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.white.withValues(alpha: 0.1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

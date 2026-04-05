@@ -206,7 +206,11 @@ class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen>
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () => context.go('/'),
+                  onPressed: () {
+                    // Invalidate providers so dashboard re-reads fresh Hive data
+                    ref.invalidate(meditationRepositoryProvider);
+                    context.go('/');
+                  },
                   child: const Text('Return to Dashboard'),
                 ),
               ),
