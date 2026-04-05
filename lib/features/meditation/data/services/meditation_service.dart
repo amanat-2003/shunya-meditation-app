@@ -18,6 +18,7 @@ class MeditationService with WidgetsBindingObserver {
   final Stopwatch _stopwatch = Stopwatch();
   DateTime? _lastTapTime;
   int _hapticInterval;
+  final String _hapticIntensity;
 
   // Rapid tap detection
   final List<DateTime> _recentTaps = [];
@@ -32,10 +33,12 @@ class MeditationService with WidgetsBindingObserver {
     required AudioService audioService,
     required String userId,
     int hapticInterval = 1,
+    String hapticIntensity = 'light',
   })  : _repository = repository,
         _audioService = audioService,
         _userId = userId,
-        _hapticInterval = hapticInterval;
+        _hapticInterval = hapticInterval,
+        _hapticIntensity = hapticIntensity;
 
   MeditationSession? get currentSession => _currentSession;
   int get tapCount => _currentSession?.totalTaps ?? 0;
@@ -85,6 +88,7 @@ class MeditationService with WidgetsBindingObserver {
     HapticService.triggerTapFeedback(
       _currentSession!.totalTaps,
       _hapticInterval,
+      intensity: _hapticIntensity,
     );
 
     // Track rapid taps for hint display

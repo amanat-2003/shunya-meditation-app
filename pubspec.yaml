@@ -50,6 +50,9 @@ dependencies:
   # Google Sign In
   google_sign_in: ^6.2.2
 
+  # File picker (for custom meditation audio)
+  file_picker: ^8.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

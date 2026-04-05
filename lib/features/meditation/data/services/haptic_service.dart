@@ -1,11 +1,27 @@
 import 'package:flutter/services.dart';
 
 class HapticService {
-  /// Trigger feedback on tap (based on the configured interval)
-  static Future<void> triggerTapFeedback(int tapCount, int interval) async {
+  /// Trigger feedback on tap with configurable intensity
+  /// [intensity] should be: 'light' (recommended), 'medium', or 'heavy'
+  static Future<void> triggerTapFeedback(
+    int tapCount,
+    int interval, {
+    String intensity = 'light',
+  }) async {
     if (interval <= 0) return;
     if (tapCount % interval == 0) {
-      await HapticFeedback.lightImpact();
+      switch (intensity) {
+        case 'heavy':
+          await HapticFeedback.heavyImpact();
+          break;
+        case 'medium':
+          await HapticFeedback.mediumImpact();
+          break;
+        case 'light':
+        default:
+          await HapticFeedback.lightImpact();
+          break;
+      }
     }
   }
 

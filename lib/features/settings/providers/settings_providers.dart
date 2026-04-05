@@ -86,4 +86,34 @@ class UserSettingsNotifier extends StateNotifier<UserSettingsModel?> {
     final updated = current.copyWith(audioReminderSound: sound);
     await updateSettings(updated);
   }
+
+  Future<void> setHapticIntensity(String intensity) async {
+    final current = state ?? UserSettingsModel();
+    final updated = current.copyWith(hapticIntensity: intensity);
+    await updateSettings(updated);
+  }
+
+  Future<void> setContinuousAudioEnabled(bool enabled) async {
+    final current = state ?? UserSettingsModel();
+    final updated = current.copyWith(continuousAudioEnabled: enabled);
+    await updateSettings(updated);
+  }
+
+  Future<void> setCustomAudio(String path, String name) async {
+    final current = state ?? UserSettingsModel();
+    final updated = current.copyWith(
+      customAudioPath: path,
+      customAudioName: name,
+    );
+    await updateSettings(updated);
+  }
+
+  Future<void> clearCustomAudio() async {
+    final current = state ?? UserSettingsModel();
+    final updated = current.copyWith(
+      customAudioPath: '',
+      customAudioName: '',
+    );
+    await updateSettings(updated);
+  }
 }

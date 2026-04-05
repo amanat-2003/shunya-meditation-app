@@ -14,18 +14,22 @@ class UserSettingsModelAdapter extends TypeAdapter<UserSettingsModel> {
       fields[reader.readByte()] = reader.read();
     }
     return UserSettingsModel(
-      dailyTapGoal: fields[0] as int,
-      dailyTimeGoalSeconds: fields[1] as int,
-      hapticInterval: fields[2] as int,
-      audioReminderEnabled: fields[3] as bool,
-      audioReminderSound: fields[4] as String,
+      dailyTapGoal: fields[0] as int? ?? 1080,
+      dailyTimeGoalSeconds: fields[1] as int? ?? 600,
+      hapticInterval: fields[2] as int? ?? 1,
+      audioReminderEnabled: fields[3] as bool? ?? false,
+      audioReminderSound: fields[4] as String? ?? 'om',
+      hapticIntensity: fields[5] as String? ?? 'light',
+      continuousAudioEnabled: fields[6] as bool? ?? false,
+      customAudioPath: fields[7] as String? ?? '',
+      customAudioName: fields[8] as String? ?? '',
     );
   }
 
   @override
   void write(BinaryWriter writer, UserSettingsModel obj) {
     writer
-      ..writeByte(5) // number of fields
+      ..writeByte(9) // number of fields
       ..writeByte(0)
       ..write(obj.dailyTapGoal)
       ..writeByte(1)
@@ -35,7 +39,15 @@ class UserSettingsModelAdapter extends TypeAdapter<UserSettingsModel> {
       ..writeByte(3)
       ..write(obj.audioReminderEnabled)
       ..writeByte(4)
-      ..write(obj.audioReminderSound);
+      ..write(obj.audioReminderSound)
+      ..writeByte(5)
+      ..write(obj.hapticIntensity)
+      ..writeByte(6)
+      ..write(obj.continuousAudioEnabled)
+      ..writeByte(7)
+      ..write(obj.customAudioPath)
+      ..writeByte(8)
+      ..write(obj.customAudioName);
   }
 
   @override

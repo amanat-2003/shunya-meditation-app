@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../meditation/providers/meditation_providers.dart';
+
+/// Global key for showing sync failure snackbars from anywhere
+final syncScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 /// Connectivity stream provider
 final connectivityProvider = StreamProvider<List<ConnectivityResult>>((ref) {
@@ -74,19 +78,64 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
       return;
     }
 
+    // Check if we have internet *before* trying
+    final hasInternet = _ref.read(hasInternetProvider);
+    if (!hasInternet) {
+      state = state.copyWith(
+        pendingCount: pending.length,
+        error: 'No internet connection',
+      );
+      _showSyncFailureNotification(
+        'Sync failed — No internet connection. '
+        '${pending.length} session${pending.length > 1 ? 's' : ''} pending.',
+      );
+      return;
+    }
+
     state = state.copyWith(isSyncing: true, pendingCount: pending.length, error: null);
 
     try {
       final synced = await repo.syncAllPending();
+      final remaining = pending.length - synced;
       state = state.copyWith(
         isSyncing: false,
-        pendingCount: pending.length - synced,
+        pendingCount: remaining,
         lastSyncTime: DateTime.now(),
       );
+      if (remaining > 0) {
+        _showSyncFailureNotification(
+          'Sync incomplete — $remaining session${remaining > 1 ? 's' : ''} '
+          'could not be synced. Will retry when online.',
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isSyncing: false,
         error: e.toString(),
+      );
+      _showSyncFailureNotification(
+        'Sync failed — ${pending.length} session${pending.length > 1 ? 's' : ''} '
+        'pending. Check your connection.',
+      );
+    }
+  }
+
+  /// Show a snackbar notification for sync failures
+  void _showSyncFailureNotification(String message) {
+    final messenger = syncScaffoldMessengerKey.currentState;
+    if (messenger != null) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: const Color(0xFFE57373),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Retry',
+            textColor: Colors.white,
+            onPressed: () => syncAll(),
+          ),
+        ),
       );
     }
   }

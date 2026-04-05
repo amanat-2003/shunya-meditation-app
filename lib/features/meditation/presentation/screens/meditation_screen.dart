@@ -64,10 +64,23 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     // Start audio reminders if enabled
     final audioService = ref.read(audioServiceProvider);
     await audioService.init();
+
+    final customPath = settings?.customAudioPath ?? '';
+    final soundName = settings?.audioReminderSound ?? 'om';
+
     audioService.startReminders(
       enabled: settings?.audioReminderEnabled ?? false,
-      soundName: settings?.audioReminderSound ?? 'om',
+      soundName: soundName,
+      customAudioPath: customPath,
     );
+
+    // Start continuous audio loop if enabled
+    if (settings?.continuousAudioEnabled ?? false) {
+      await audioService.startContinuousLoop(
+        soundName: soundName,
+        customAudioPath: customPath,
+      );
+    }
 
     meditationService.onTapRegistered = () {
       if (mounted) {
@@ -164,6 +177,8 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     _exitProgressTimer?.cancel();
 
     final meditationService = ref.read(meditationServiceProvider);
+    final audioService = ref.read(audioServiceProvider);
+    await audioService.stopContinuousLoop();
     final session = await meditationService.endSession();
 
     // Invalidate dashboard providers so they re-read fresh Hive data

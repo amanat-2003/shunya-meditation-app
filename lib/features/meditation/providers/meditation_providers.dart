@@ -35,6 +35,7 @@ final meditationServiceProvider = Provider<MeditationService>((ref) {
     audioService: audioService,
     userId: user?.id ?? '',
     hapticInterval: settings?.hapticInterval ?? 1,
+    hapticIntensity: settings?.hapticIntensity ?? 'light',
   );
 
   ref.onDispose(() => service.dispose());

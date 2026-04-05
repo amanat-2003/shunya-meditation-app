@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -136,12 +137,58 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
 
-                    // Audio reminders
+                    // Haptic intensity
                     _SettingsCard(
-                      icon: Icons.music_note_rounded,
+                      icon: Icons.speed_rounded,
+                      title: 'Haptic Intensity',
+                      subtitle: _hapticIntensityLabel(settings?.hapticIntensity ?? 'light'),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceElevated,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: DropdownButton<String>(
+                          value: settings?.hapticIntensity ?? 'light',
+                          dropdownColor: AppTheme.surfaceElevated,
+                          underline: const SizedBox(),
+                          style: TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: 14,
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'light',
+                              child: Text('Light ★'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'medium',
+                              child: Text('Medium'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'heavy',
+                              child: Text('Heavy'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              settingsNotifier.setHapticIntensity(value);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+                    _SectionTitle('Audio'),
+                    const SizedBox(height: 12),
+
+                    // Audio reminders (periodic)
+                    _SettingsCard(
+                      icon: Icons.notifications_active_rounded,
                       title: 'Audio Reminders',
                       subtitle: settings?.audioReminderEnabled == true
-                          ? 'Play "${settings?.audioReminderSound ?? 'om'}" every 8-15 min'
+                          ? 'Play "${settings?.activeAudioDisplayName}" every 8-15 min'
                           : 'Disabled',
                       trailing: Switch(
                         value: settings?.audioReminderEnabled ?? false,
@@ -149,6 +196,126 @@ class SettingsScreen extends ConsumerWidget {
                         onChanged: (value) {
                           settingsNotifier.setAudioReminderEnabled(value);
                         },
+                      ),
+                    ),
+
+                    // Continuous audio loop
+                    _SettingsCard(
+                      icon: Icons.loop_rounded,
+                      title: 'Continuous Sound Loop',
+                      subtitle: settings?.continuousAudioEnabled == true
+                          ? 'Plays "${settings?.activeAudioDisplayName}" on loop during meditation'
+                          : 'Disabled',
+                      trailing: Switch(
+                        value: settings?.continuousAudioEnabled ?? false,
+                        activeTrackColor: AppTheme.primaryGold,
+                        onChanged: (value) {
+                          settingsNotifier.setContinuousAudioEnabled(value);
+                        },
+                      ),
+                    ),
+
+                    // Sound selection (built-in)
+                    _SettingsCard(
+                      icon: Icons.music_note_rounded,
+                      title: 'Sound',
+                      subtitle:
+                          (settings?.customAudioPath ?? '').isNotEmpty
+                              ? 'Custom: ${settings?.customAudioName}'
+                              : 'Built-in: ${settings?.activeAudioDisplayName}',
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceElevated,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: DropdownButton<String>(
+                          value: settings?.audioReminderSound ?? 'om',
+                          dropdownColor: AppTheme.surfaceElevated,
+                          underline: const SizedBox(),
+                          style: TextStyle(
+                            color: AppTheme.textPrimary,
+                            fontSize: 14,
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'om',
+                              child: Text('Om'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'bell',
+                              child: Text('Bell'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value != null) {
+                              settingsNotifier.setAudioReminderSound(value);
+                              // When choosing a built-in sound, clear custom audio
+                              settingsNotifier.clearCustomAudio();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+
+                    // Custom audio picker
+                    GestureDetector(
+                      onTap: () => _pickCustomAudio(context, settingsNotifier),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceCard,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryGold.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Icon(Icons.folder_open_rounded, color: AppTheme.primaryGold, size: 18),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Use Custom Audio',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppTheme.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    (settings?.customAudioPath ?? '').isNotEmpty
+                                        ? settings!.customAudioName
+                                        : 'Tap to pick an audio file from your device',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: (settings?.customAudioPath ?? '').isNotEmpty
+                                          ? AppTheme.successGreen
+                                          : AppTheme.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if ((settings?.customAudioPath ?? '').isNotEmpty)
+                              GestureDetector(
+                                onTap: () => settingsNotifier.clearCustomAudio(),
+                                child: Icon(Icons.close_rounded, color: AppTheme.textMuted, size: 18),
+                              )
+                            else
+                              Icon(Icons.chevron_right_rounded, color: AppTheme.textMuted, size: 20),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -169,9 +336,11 @@ class SettingsScreen extends ConsumerWidget {
                     _SettingsCard(
                       icon: Icons.cloud_sync_rounded,
                       title: 'Sync Status',
-                      subtitle: syncState.pendingCount > 0
-                          ? '${syncState.pendingCount} session${syncState.pendingCount > 1 ? 's' : ''} pending'
-                          : 'All data synced',
+                      subtitle: syncState.error != null
+                          ? syncState.error!
+                          : syncState.pendingCount > 0
+                              ? '${syncState.pendingCount} session${syncState.pendingCount > 1 ? 's' : ''} pending'
+                              : 'All data synced',
                       trailing: syncState.isSyncing
                           ? SizedBox(
                               width: 20,
@@ -301,6 +470,43 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _hapticIntensityLabel(String intensity) {
+    switch (intensity) {
+      case 'heavy':
+        return 'Heavy vibration';
+      case 'medium':
+        return 'Medium vibration';
+      case 'light':
+      default:
+        return 'Light vibration (Recommended)';
+    }
+  }
+
+  Future<void> _pickCustomAudio(BuildContext context, UserSettingsNotifier notifier) async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.audio,
+        allowMultiple: false,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        if (file.path != null) {
+          await notifier.setCustomAudio(file.path!, file.name);
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not pick audio file: $e'),
+            backgroundColor: const Color(0xFFE57373),
+          ),
+        );
+      }
+    }
   }
 }
 
