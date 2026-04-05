@@ -177,9 +177,12 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
 
     // Invalidate dashboard providers so they re-read fresh Hive data
     ref.invalidate(todayTapsProvider);
+    ref.invalidate(todayTimeSecondsProvider);
     ref.invalidate(lifetimeTapsProvider);
+    ref.invalidate(lifetimeTimeSecondsProvider);
     ref.invalidate(currentStreakProvider);
     ref.invalidate(weeklyTapsProvider);
+    ref.invalidate(weeklyTimeSecondsProvider);
     ref.invalidate(monthlyFrequencyProvider);
     ref.invalidate(pendingSessionsCountProvider);
 

@@ -50,7 +50,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ref.invalidate(todayTapsProvider);
     ref.invalidate(todayTimeSecondsProvider);
     ref.invalidate(lifetimeTapsProvider);
+    ref.invalidate(lifetimeTimeSecondsProvider);
     ref.invalidate(currentStreakProvider);
+    ref.invalidate(weeklyTapsProvider);
+    ref.invalidate(weeklyTimeSecondsProvider);
+    ref.invalidate(monthlyFrequencyProvider);
     ref.invalidate(userSettingsProvider);
 
     // 2. Check for offline sessions pending upload

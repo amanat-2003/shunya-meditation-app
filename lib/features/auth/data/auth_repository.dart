@@ -1,5 +1,9 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import '../../meditation/data/models/meditation_session.dart';
+import '../../settings/data/models/user_settings_model.dart';
 
 class AuthRepository {
   final SupabaseClient _client;
@@ -73,6 +77,14 @@ class AuthRepository {
     try {
       await GoogleSignIn().signOut();
     } catch (_) {}
+    
+    // Clear all local data on sign out
+    try {
+      await Hive.box<MeditationSession>('meditation_sessions').clear();
+      await Hive.box<UserSettingsModel>('user_settings').clear();
+      await Hive.box('app_state').clear();
+    } catch (_) {}
+
     await _client.auth.signOut();
   }
 
