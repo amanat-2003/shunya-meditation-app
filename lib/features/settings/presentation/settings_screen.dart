@@ -243,8 +243,8 @@ class SettingsScreen extends ConsumerWidget {
                               child: Text('Om'),
                             ),
                             DropdownMenuItem(
-                              value: 'bell',
-                              child: Text('Bell'),
+                              value: 'waheguru',
+                              child: Text('Waheguru'),
                             ),
                           ],
                           onChanged: (value) {
@@ -353,7 +353,7 @@ class SettingsScreen extends ConsumerWidget {
                           : syncState.pendingCount > 0
                               ? TextButton(
                                   onPressed: () {
-                                    ref.read(syncStateProvider.notifier).syncAll();
+                                    ref.read(syncStateProvider.notifier).syncAll(showNotification: true);
                                   },
                                   child: Text(
                                     'Sync',

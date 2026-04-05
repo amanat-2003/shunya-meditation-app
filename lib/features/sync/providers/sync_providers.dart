@@ -60,16 +60,16 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
   final Ref _ref;
 
   SyncStateNotifier(this._ref) : super(const SyncState()) {
-    // Listen for connectivity changes and auto-sync
+    // Listen for connectivity changes and auto-sync silently in the background
     _ref.listen(hasInternetProvider, (previous, next) {
       if (next && !state.isSyncing) {
-        syncAll();
+        syncAll(showNotification: false);
       }
     });
   }
 
   /// Sync all pending sessions
-  Future<void> syncAll() async {
+  Future<void> syncAll({bool showNotification = false}) async {
     final repo = _ref.read(meditationRepositoryProvider);
     final pending = repo.getPendingSessions();
 
@@ -85,10 +85,12 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
         pendingCount: pending.length,
         error: 'No internet connection',
       );
-      _showSyncFailureNotification(
-        'Sync failed — No internet connection. '
-        '${pending.length} session${pending.length > 1 ? 's' : ''} pending.',
-      );
+      if (showNotification) {
+        _showSyncFailureNotification(
+          'Sync failed — No internet connection. '
+          '${pending.length} session${pending.length > 1 ? 's' : ''} pending.',
+        );
+      }
       return;
     }
 
@@ -102,7 +104,7 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
         pendingCount: remaining,
         lastSyncTime: DateTime.now(),
       );
-      if (remaining > 0) {
+      if (remaining > 0 && showNotification) {
         _showSyncFailureNotification(
           'Sync incomplete — $remaining session${remaining > 1 ? 's' : ''} '
           'could not be synced. Will retry when online.',
@@ -113,10 +115,12 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
         isSyncing: false,
         error: e.toString(),
       );
-      _showSyncFailureNotification(
-        'Sync failed — ${pending.length} session${pending.length > 1 ? 's' : ''} '
-        'pending. Check your connection.',
-      );
+      if (showNotification) {
+        _showSyncFailureNotification(
+          'Sync failed — ${pending.length} session${pending.length > 1 ? 's' : ''} '
+          'pending. Check your connection.',
+        );
+      }
     }
   }
 
@@ -133,7 +137,7 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
           action: SnackBarAction(
             label: 'Retry',
             textColor: Colors.white,
-            onPressed: () => syncAll(),
+            onPressed: () => syncAll(showNotification: true),
           ),
         ),
       );
