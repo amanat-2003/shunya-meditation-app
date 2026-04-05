@@ -34,6 +34,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     // 1. If fresh install, aggressively sync down data from cloud FIRST
     await syncNotifier.syncDownIfFreshInstall(userId);
+    
+    // Invalidate cached providers so the UI updates instantly with the new data
+    ref.invalidate(userSessionsProvider);
+    ref.invalidate(todayTapsProvider);
+    ref.invalidate(lifetimeTapsProvider);
+    ref.invalidate(currentStreakProvider);
+    ref.invalidate(userSettingsProvider);
 
     // 2. Check for offline sessions pending upload
     final hasPending = await syncNotifier.hasPendingSessions();

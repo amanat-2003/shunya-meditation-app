@@ -279,21 +279,24 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
                           width: 120,
                           child: LinearProgressIndicator(
                             value: _exitProgress,
-                            backgroundColor: Colors.white.withValues(alpha: 0.05),
+                            backgroundColor: Colors.white.withValues(alpha: 0.2),
                             valueColor: AlwaysStoppedAnimation<Color>(
                               _exitReady
-                                  ? AppTheme.successGreen.withValues(alpha: 0.5)
-                                  : AppTheme.primaryGold.withValues(alpha: 0.3),
+                                  ? AppTheme.successGreen
+                                  : AppTheme.primaryGold,
                             ),
-                            minHeight: 2,
+                            minHeight: 6,
+                            borderRadius: BorderRadius.circular(3),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         Text(
                           _exitReady ? 'Release & swipe up' : 'Hold to exit...',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.white.withValues(alpha: 0.1),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ],
