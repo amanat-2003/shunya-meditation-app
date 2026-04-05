@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../meditation/providers/meditation_providers.dart';
 import '../widgets/bar_chart_widget.dart';
 import '../widgets/heatmap_widget.dart';
+import '../widgets/stats_cards.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -16,8 +17,11 @@ class StatsScreen extends ConsumerWidget {
     final lifetimeTaps = ref.watch(lifetimeTapsProvider);
     final streak = ref.watch(currentStreakProvider);
     final weeklyTaps = ref.watch(weeklyTapsProvider);
+    final weeklyTime = ref.watch(weeklyTimeSecondsProvider);
     final monthlyFrequency = ref.watch(monthlyFrequencyProvider);
     final todayTaps = ref.watch(todayTapsProvider);
+    final lifetimeTime = ref.watch(lifetimeTimeSecondsProvider);
+    final todayTime = ref.watch(todayTimeSecondsProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -43,24 +47,12 @@ class StatsScreen extends ConsumerWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-                child: Row(
-                  children: [
-                    _QuickStat(
-                      value: _formatCount(lifetimeTaps),
-                      label: 'Total Taps',
-                      color: AppTheme.primaryGold,
-                    ),
-                    _QuickStat(
-                      value: '$streak',
-                      label: 'Day Streak',
-                      color: AppTheme.accentWarm,
-                    ),
-                    _QuickStat(
-                      value: _formatCount(todayTaps),
-                      label: 'Today',
-                      color: AppTheme.successGreen,
-                    ),
-                  ],
+                child: StatsCards(
+                  lifetimeTaps: lifetimeTaps,
+                  currentStreak: streak,
+                  todayTaps: todayTaps,
+                  lifetimeTimeSeconds: lifetimeTime,
+                  todayTimeSeconds: todayTime,
                 ),
               ),
             ),
@@ -97,7 +89,20 @@ class StatsScreen extends ConsumerWidget {
                       const SizedBox(height: 20),
                       SizedBox(
                         height: 180,
-                        child: WeeklyBarChart(weeklyTaps: weeklyTaps),
+                        child: WeeklyBarChart(weeklyData: weeklyTaps),
+                      ),
+                      const SizedBox(height: 32),
+                      Text(
+                        'Time per day',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 180,
+                        child: WeeklyBarChart(weeklyData: weeklyTime, isTimeData: true),
                       ),
                     ],
                   ),
@@ -128,7 +133,7 @@ class StatsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Meditation frequency',
+                        'Meditation sessions frequency',
                         style: TextStyle(
                           fontSize: 12,
                           color: AppTheme.textMuted,
@@ -152,58 +157,4 @@ class StatsScreen extends ConsumerWidget {
     );
   }
 
-  String _formatCount(int count) {
-    if (count >= 1000000) return '${(count / 1000000).toStringAsFixed(1)}M';
-    if (count >= 1000) return '${(count / 1000).toStringAsFixed(1)}K';
-    return '$count';
-  }
-}
-
-class _QuickStat extends StatelessWidget {
-  final String value;
-  final String label;
-  final Color color;
-
-  const _QuickStat({
-    required this.value,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: color.withValues(alpha: 0.1),
-          ),
-        ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                color: AppTheme.textMuted,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

@@ -173,6 +173,14 @@ class MeditationRepository {
     return weeklyTaps;
   }
 
+  /// Get lifetime total meditated time in seconds
+  int getLifetimeTimeSeconds(String userId) {
+    return getUserSessions(userId).fold<int>(
+      0,
+      (sum, session) => sum + session.durationSeconds,
+    );
+  }
+
   /// Get monthly session frequency (sessions per day for current month)
   Map<DateTime, int> getMonthlyFrequency(String userId) {
     final today = DateTime.now();
@@ -187,5 +195,24 @@ class MeditationRepository {
     }
 
     return frequency;
+  }
+
+  /// Get time meditated per day for the last 7 days (in seconds)
+  Map<DateTime, int> getWeeklyTime(String userId) {
+    final today = DateTime.now();
+    final Map<DateTime, int> weeklyTime = {};
+
+    for (int i = 6; i >= 0; i--) {
+      final date = DateTime(today.year, today.month, today.day)
+          .subtract(Duration(days: i));
+      final nextDate = date.add(const Duration(days: 1));
+      final sessions = getSessionsInRange(userId, date, nextDate);
+      weeklyTime[date] = sessions.fold<int>(
+        0,
+        (sum, s) => sum + s.durationSeconds,
+      );
+    }
+
+    return weeklyTime;
   }
 }

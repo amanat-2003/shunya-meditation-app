@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/time_utils.dart';
 import '../../../auth/providers/auth_providers.dart';
 import '../../../meditation/providers/meditation_providers.dart';
 import '../../../settings/providers/settings_providers.dart';
@@ -19,6 +20,15 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  final PageController _progressPageController = PageController();
+  int _progressPageIndex = 0;
+
+  @override
+  void dispose() {
+    _progressPageController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -118,9 +128,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final timeGoalSeconds = settings?.dailyTimeGoalSeconds ?? 600;
 
     final goalPercent = dailyGoal > 0 ? (todayTaps / dailyGoal).clamp(0.0, 1.0) : 0.0;
-    
-    final todayMins = todaySeconds ~/ 60;
-    final goalMins = timeGoalSeconds ~/ 60;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -218,62 +225,42 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       SizedBox(
-                        width: 140,
-                        height: 140,
-                        child: Stack(
-                          alignment: Alignment.center,
+                        height: 160,
+                        child: PageView(
+                          controller: _progressPageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _progressPageIndex = index;
+                            });
+                          },
                           children: [
-                            SizedBox(
-                              width: 140,
-                              height: 140,
-                              child: CircularProgressIndicator(
-                                value: goalPercent,
-                                strokeWidth: 8,
-                                strokeCap: StrokeCap.round,
-                                backgroundColor: AppTheme.dividerColor,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  goalPercent >= 1.0
-                                      ? AppTheme.successGreen
-                                      : AppTheme.primaryGold,
-                                ),
-                              ),
+                            // PAGE 1: Taps Progress
+                            _buildProgressCircle(
+                              percent: goalPercent,
+                              valueStr: '${(goalPercent * 100).round()}%',
+                              subText: '$todayTaps / $dailyGoal taps',
+                              color: goalPercent >= 1.0 ? AppTheme.successGreen : AppTheme.primaryGold,
                             ),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '${(goalPercent * 100).round()}%',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppTheme.textPrimary,
-                                  ),
-                                ),
-                                Text(
-                                  '$todayTaps / $dailyGoal taps',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppTheme.textMuted,
-                                  ),
-                                ),
-                                if (timeGoalSeconds > 0)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 2),
-                                    child: Text(
-                                      '${todayMins}m / ${goalMins}m',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        color: AppTheme.primaryGold.withValues(alpha: 0.8),
-                                      ),
-                                    ),
-                                  ),
-                              ],
+                            // PAGE 2: Time Progress
+                            _buildProgressCircle(
+                              percent: timeGoalSeconds > 0 ? (todaySeconds / timeGoalSeconds).clamp(0.0, 1.0) : 0.0,
+                              valueStr: '${(timeGoalSeconds > 0 ? (todaySeconds / timeGoalSeconds).clamp(0.0, 1.0) * 100 : 0.0).round()}%',
+                              subText: '${TimeUtils.formatDuration(todaySeconds)} / ${TimeUtils.formatDuration(timeGoalSeconds)}',
+                              color: (timeGoalSeconds > 0 && todaySeconds >= timeGoalSeconds) ? AppTheme.successGreen : AppTheme.accentWarm,
                             ),
                           ],
                         ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildPageDot(0),
+                          const SizedBox(width: 8),
+                          _buildPageDot(1),
+                        ],
                       ),
                     ],
                   ),
@@ -289,6 +276,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   lifetimeTaps: lifetimeTaps,
                   currentStreak: streak,
                   todayTaps: todayTaps,
+                  lifetimeTimeSeconds: ref.watch(lifetimeTimeSecondsProvider),
+                  todayTimeSeconds: todaySeconds,
                 ),
               ),
             ),
@@ -325,5 +314,68 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     if (hour < 12) return 'Good morning';
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
+  }
+
+  Widget _buildProgressCircle({
+    required double percent,
+    required String valueStr,
+    required String subText,
+    required Color color,
+  }) {
+    return Center(
+      child: SizedBox(
+        width: 140,
+        height: 140,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: 140,
+              height: 140,
+              child: CircularProgressIndicator(
+                value: percent,
+                strokeWidth: 8,
+                strokeCap: StrokeCap.round,
+                backgroundColor: AppTheme.dividerColor,
+                valueColor: AlwaysStoppedAnimation<Color>(color),
+              ),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  valueStr,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                Text(
+                  subText,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPageDot(int index) {
+    final isActive = _progressPageIndex == index;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: 6,
+      width: isActive ? 16 : 6,
+      decoration: BoxDecoration(
+        color: isActive ? AppTheme.primaryGold : AppTheme.dividerColor,
+        borderRadius: BorderRadius.circular(3),
+      ),
+    );
   }
 }

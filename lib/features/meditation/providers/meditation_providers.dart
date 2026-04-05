@@ -76,6 +76,14 @@ final lifetimeTapsProvider = Provider<int>((ref) {
   return repo.getLifetimeTaps(user.id);
 });
 
+/// Provides lifetime meditated time in seconds
+final lifetimeTimeSecondsProvider = Provider<int>((ref) {
+  final repo = ref.watch(meditationRepositoryProvider);
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return 0;
+  return repo.getLifetimeTimeSeconds(user.id);
+});
+
 /// Provides current streak
 final currentStreakProvider = Provider<int>((ref) {
   final repo = ref.watch(meditationRepositoryProvider);
@@ -90,6 +98,14 @@ final weeklyTapsProvider = Provider<Map<DateTime, int>>((ref) {
   final user = ref.watch(currentUserProvider);
   if (user == null) return {};
   return repo.getWeeklyTaps(user.id);
+});
+
+/// Provides weekly meditated time data
+final weeklyTimeSecondsProvider = Provider<Map<DateTime, int>>((ref) {
+  final repo = ref.watch(meditationRepositoryProvider);
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return {};
+  return repo.getWeeklyTime(user.id);
 });
 
 /// Provides monthly frequency data

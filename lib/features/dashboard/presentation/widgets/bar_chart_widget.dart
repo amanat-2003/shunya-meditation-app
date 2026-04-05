@@ -4,14 +4,21 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
-class WeeklyBarChart extends StatelessWidget {
-  final Map<DateTime, int> weeklyTaps;
+import '../../../../core/utils/time_utils.dart';
 
-  const WeeklyBarChart({super.key, required this.weeklyTaps});
+class WeeklyBarChart extends StatelessWidget {
+  final Map<DateTime, int> weeklyData;
+  final bool isTimeData;
+
+  const WeeklyBarChart({
+    super.key,
+    required this.weeklyData,
+    this.isTimeData = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final entries = weeklyTaps.entries.toList();
+    final entries = weeklyData.entries.toList();
     if (entries.isEmpty) {
       return Center(
         child: Text(
@@ -36,8 +43,12 @@ class WeeklyBarChart extends StatelessWidget {
             tooltipRoundedRadius: 8,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               final date = entries[group.x.toInt()].key;
+              final valString = isTimeData 
+                  ? TimeUtils.formatDuration(rod.toY.toInt()) 
+                  : '${rod.toY.toInt()} taps';
+              
               return BarTooltipItem(
-                '${DateFormat('EEE').format(date)}\n${rod.toY.toInt()} taps',
+                '${DateFormat('EEE').format(date)}\n$valString',
                 TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 12,

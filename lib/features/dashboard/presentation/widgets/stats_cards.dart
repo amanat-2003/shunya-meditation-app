@@ -1,50 +1,82 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/time_utils.dart';
 
 class StatsCards extends StatelessWidget {
   final int lifetimeTaps;
   final int currentStreak;
   final int todayTaps;
+  final int lifetimeTimeSeconds;
+  final int todayTimeSeconds;
 
   const StatsCards({
     super.key,
     required this.lifetimeTaps,
     required this.currentStreak,
     required this.todayTaps,
+    required this.lifetimeTimeSeconds,
+    required this.todayTimeSeconds,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _MiniStatCard(
-            icon: Icons.touch_app_rounded,
-            iconColor: AppTheme.primaryGold,
-            label: 'Lifetime',
-            value: _formatCount(lifetimeTaps),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 105,
+            child: _MiniStatCard(
+              icon: Icons.touch_app_rounded,
+              iconColor: AppTheme.primaryGold,
+              label: 'Total Taps',
+              value: _formatCount(lifetimeTaps),
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _MiniStatCard(
-            icon: Icons.local_fire_department_rounded,
-            iconColor: AppTheme.accentWarm,
-            label: 'Streak',
-            value: '$currentStreak day${currentStreak != 1 ? 's' : ''}',
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 105,
+            child: _MiniStatCard(
+              icon: Icons.local_fire_department_rounded,
+              iconColor: AppTheme.accentWarm,
+              label: 'Streak',
+              value: '$currentStreak day${currentStreak != 1 ? 's' : ''}',
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _MiniStatCard(
-            icon: Icons.today_rounded,
-            iconColor: AppTheme.successGreen,
-            label: 'Today',
-            value: _formatCount(todayTaps),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 105,
+            child: _MiniStatCard(
+              icon: Icons.today_rounded,
+              iconColor: AppTheme.successGreen,
+              label: 'Today Taps',
+              value: _formatCount(todayTaps),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 105,
+            child: _MiniStatCard(
+              icon: Icons.timer_rounded,
+              iconColor: AppTheme.primaryGold,
+              label: 'Total Time',
+              value: TimeUtils.formatDuration(lifetimeTimeSeconds),
+            ),
+          ),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 105,
+            child: _MiniStatCard(
+              icon: Icons.access_time_rounded,
+              iconColor: AppTheme.successGreen,
+              label: 'Today Time',
+              value: TimeUtils.formatDuration(todayTimeSeconds),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
