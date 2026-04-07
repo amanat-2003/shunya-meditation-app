@@ -77,3 +77,7 @@ android/key.properties
 # Pods (can be regenerated with `cd ios && pod install`)
 # Uncomment the line below if you want to exclude Pods from git
 # ios/Pods/
+
+# Play Store Keys
+android/app/*-keystore.jks
+android/key.properties

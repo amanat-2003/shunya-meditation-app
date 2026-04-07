@@ -64,7 +64,7 @@ class AuthRepository {
     try {
       await _client.auth.signInWithOAuth(
         OAuthProvider.apple,
-        redirectTo: 'com.shunya.shunya://login-callback/',
+        redirectTo: 'com.anamiapps.shunya://login-callback/',
       );
       return true;
     } catch (e) {
