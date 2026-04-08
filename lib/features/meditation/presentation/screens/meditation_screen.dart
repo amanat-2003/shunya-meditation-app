@@ -48,10 +48,10 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     final settings = ref.read(userSettingsProvider);
     final isBrightMode = settings?.brightModeEnabled ?? true;
 
-    if (!kIsWeb) {
-      // Enable wakelock (mobile only)
-      await WakelockPlus.enable();
+    // Enable wakelock (works on both native & web)
+    await WakelockPlus.enable();
 
+    if (!kIsWeb) {
       // Set minimum brightness ONLY if bright UI mode is logically disabled
       if (!isBrightMode) {
         try {
@@ -164,12 +164,14 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
   }
 
   Future<void> _endSession() async {
+    // Disable wakelock (works on both native & web)
+    await WakelockPlus.disable();
+
     // Restore screen (mobile only)
     if (!kIsWeb) {
       try {
         await ScreenBrightness().resetScreenBrightness();
       } catch (_) {}
-      await WakelockPlus.disable();
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
 
@@ -208,10 +210,12 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     _longPressTimer?.cancel();
     _exitProgressTimer?.cancel();
 
+    // Disable wakelock (works on both native & web)
+    WakelockPlus.disable().catchError((_) {});
+
     // Restore screen settings (mobile only)
     if (!kIsWeb) {
       ScreenBrightness().resetScreenBrightness().catchError((_) {});
-      WakelockPlus.disable().catchError((_) {});
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
 
