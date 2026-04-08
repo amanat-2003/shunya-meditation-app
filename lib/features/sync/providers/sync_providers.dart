@@ -21,7 +21,7 @@ final hasInternetProvider = Provider<bool>((ref) {
   return connectivity.whenOrNull(
         data: (results) => results.any((r) => r != ConnectivityResult.none),
       ) ??
-      false;
+      true; // Optimistically assume true while loading
 });
 
 /// Sync state
