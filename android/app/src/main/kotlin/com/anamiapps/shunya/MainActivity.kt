@@ -1,4 +1,4 @@
-package com.shunya.shunya
+package com.anamiapps.shunya
 
 import io.flutter.embedding.android.FlutterActivity
 
