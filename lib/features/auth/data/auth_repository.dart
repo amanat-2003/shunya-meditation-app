@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,7 +16,18 @@ class AuthRepository {
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
   /// Sign in with Google
-  Future<AuthResponse> signInWithGoogle() async {
+  Future<AuthResponse?> signInWithGoogle() async {
+    if (kIsWeb) {
+      // On web, use Supabase OAuth redirect flow
+      await _client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: Uri.base.origin,
+      );
+      // OAuth redirect — won't return an AuthResponse immediately
+      return null;
+    }
+
+    // Native flow for mobile
     const webClientId = String.fromEnvironment(
       'GOOGLE_WEB_CLIENT_ID',
       defaultValue: '',
@@ -64,7 +76,7 @@ class AuthRepository {
     try {
       await _client.auth.signInWithOAuth(
         OAuthProvider.apple,
-        redirectTo: 'com.anamiapps.shunya://login-callback/',
+        redirectTo: kIsWeb ? Uri.base.origin : 'com.anamiapps.shunya://login-callback/',
       );
       return true;
     } catch (e) {
@@ -74,9 +86,11 @@ class AuthRepository {
 
   /// Sign out
   Future<void> signOut() async {
-    try {
-      await GoogleSignIn().signOut();
-    } catch (_) {}
+    if (!kIsWeb) {
+      try {
+        await GoogleSignIn().signOut();
+      } catch (_) {}
+    }
     
     // Clear all local data on sign out
     try {
@@ -111,3 +125,4 @@ class AuthRepository {
     }
   }
 }
+

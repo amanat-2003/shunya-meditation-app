@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,18 +48,20 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     final settings = ref.read(userSettingsProvider);
     final isBrightMode = settings?.brightModeEnabled ?? true;
 
-    // Enable wakelock
-    await WakelockPlus.enable();
+    if (!kIsWeb) {
+      // Enable wakelock (mobile only)
+      await WakelockPlus.enable();
 
-    // Set minimum brightness ONLY if bright UI mode is logically disabled
-    if (!isBrightMode) {
-      try {
-        await ScreenBrightness().setScreenBrightness(0.01);
-      } catch (_) {}
+      // Set minimum brightness ONLY if bright UI mode is logically disabled
+      if (!isBrightMode) {
+        try {
+          await ScreenBrightness().setScreenBrightness(0.01);
+        } catch (_) {}
+      }
+
+      // Hide system UI — fully immersive, hides all bars and prevents pull-down
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     }
-
-    // Hide system UI — fully immersive, hides all bars and prevents pull-down
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     // Start the service
     final meditationService = ref.read(meditationServiceProvider);
@@ -161,12 +164,14 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
   }
 
   Future<void> _endSession() async {
-    // Restore screen
-    try {
-      await ScreenBrightness().resetScreenBrightness();
-    } catch (_) {}
-    await WakelockPlus.disable();
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    // Restore screen (mobile only)
+    if (!kIsWeb) {
+      try {
+        await ScreenBrightness().resetScreenBrightness();
+      } catch (_) {}
+      await WakelockPlus.disable();
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    }
 
     _timerTick?.cancel();
     _hintTimer?.cancel();
@@ -203,10 +208,12 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen> {
     _longPressTimer?.cancel();
     _exitProgressTimer?.cancel();
 
-    // Restore screen settings
-    ScreenBrightness().resetScreenBrightness().catchError((_) {});
-    WakelockPlus.disable().catchError((_) {});
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    // Restore screen settings (mobile only)
+    if (!kIsWeb) {
+      ScreenBrightness().resetScreenBrightness().catchError((_) {});
+      WakelockPlus.disable().catchError((_) {});
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    }
 
     super.dispose();
   }

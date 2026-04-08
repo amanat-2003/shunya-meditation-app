@@ -41,8 +41,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     setState(() => _isLoading = true);
     try {
       final authRepo = ref.read(authRepositoryProvider);
-      await authRepo.signInWithGoogle();
-      await authRepo.ensureUserSettings();
+      final response = await authRepo.signInWithGoogle();
+      // On web, signInWithGoogle triggers a redirect and returns null.
+      // ensureUserSettings will be called after the redirect completes.
+      if (response != null) {
+        await authRepo.ensureUserSettings();
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -64,8 +68,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Column(
               children: [
                 const Spacer(flex: 3),
@@ -233,6 +240,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
                 const Spacer(flex: 1),
               ],
+            ),
+          ),
             ),
           ),
         ),

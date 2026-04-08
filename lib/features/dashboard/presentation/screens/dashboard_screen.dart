@@ -42,6 +42,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final syncNotifier = ref.read(syncStateProvider.notifier);
     final userId = ref.read(currentUserProvider)?.id;
 
+    // Ensure user settings exist (important for web OAuth redirect flow)
+    try {
+      final authRepo = ref.read(authRepositoryProvider);
+      await authRepo.ensureUserSettings();
+    } catch (_) {}
+
     // 1. If fresh install, aggressively sync down data from cloud FIRST
     await syncNotifier.syncDownIfFreshInstall(userId);
     
@@ -136,7 +142,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: CustomScrollView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: CustomScrollView(
           slivers: [
             // Header
             SliverToBoxAdapter(
@@ -291,6 +300,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               child: SizedBox(height: 100),
             ),
           ],
+        ),
+          ),
         ),
       ),
       floatingActionButton: Container(

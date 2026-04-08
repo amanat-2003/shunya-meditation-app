@@ -26,7 +26,10 @@ class StatsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: CustomScrollView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: CustomScrollView(
           slivers: [
             // Header
             SliverToBoxAdapter(
@@ -152,6 +155,8 @@ class StatsScreen extends ConsumerWidget {
               child: SizedBox(height: 100),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

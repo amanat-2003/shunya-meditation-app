@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'dart:io';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/file_helper.dart';
 import '../../../sync/providers/sync_providers.dart';
 
 class AudioService {
@@ -48,8 +50,8 @@ class AudioService {
       await _loopPlayer!.stop();
 
       bool usedCustom = false;
-      if (customAudioPath.isNotEmpty) {
-        if (File(customAudioPath).existsSync()) {
+      if (!kIsWeb && customAudioPath.isNotEmpty) {
+        if (FileHelper.fileExists(customAudioPath)) {
           try {
             await _loopPlayer!.setFilePath(customAudioPath);
             usedCustom = true;
@@ -94,8 +96,8 @@ class AudioService {
     if (_player == null) return;
     try {
       bool usedCustom = false;
-      if (_customAudioPath.isNotEmpty) {
-        if (File(_customAudioPath).existsSync()) {
+      if (!kIsWeb && _customAudioPath.isNotEmpty) {
+        if (FileHelper.fileExists(_customAudioPath)) {
           try {
             await _player!.setFilePath(_customAudioPath);
             usedCustom = true;

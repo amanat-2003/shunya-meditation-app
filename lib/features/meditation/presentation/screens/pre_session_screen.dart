@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
@@ -123,20 +123,16 @@ class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
               _ActionButton(
                 icon: Icons.do_not_disturb_on_rounded,
                 title: 'Enable Do Not Disturb',
-                subtitle: Platform.isIOS
-                    ? 'Opens Settings'
+                subtitle: kIsWeb
+                    ? 'Enable via your system settings'
                     : 'Opens sound & vibration settings',
-                onTap: () {
-                  if (Platform.isAndroid) {
-                    AppSettings.openAppSettings(
-                      type: AppSettingsType.sound,
-                    );
-                  } else {
-                    AppSettings.openAppSettings(
-                      type: AppSettingsType.settings,
-                    );
-                  }
-                },
+                onTap: kIsWeb
+                    ? null
+                    : () {
+                        AppSettings.openAppSettings(
+                          type: AppSettingsType.sound,
+                        );
+                      },
               ),
 
               const SizedBox(height: 10),
@@ -144,14 +140,16 @@ class _PreSessionScreenState extends ConsumerState<PreSessionScreen>
               _ActionButton(
                 icon: Icons.airplanemode_active_rounded,
                 title: 'Enable Airplane Mode',
-                subtitle: Platform.isIOS
-                    ? 'Opens connectivity settings'
+                subtitle: kIsWeb
+                    ? 'Enable via your system settings'
                     : 'Opens connectivity settings',
-                onTap: () {
-                  AppSettings.openAppSettings(
-                    type: AppSettingsType.wireless,
-                  );
-                },
+                onTap: kIsWeb
+                    ? null
+                    : () {
+                        AppSettings.openAppSettings(
+                          type: AppSettingsType.wireless,
+                        );
+                      },
               ),
 
               const SizedBox(height: 28),
@@ -287,7 +285,7 @@ class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _ActionButton({
     required this.icon,

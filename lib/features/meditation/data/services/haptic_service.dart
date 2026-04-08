@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 
 class HapticService {
@@ -8,6 +9,7 @@ class HapticService {
     int interval, {
     String intensity = 'light',
   }) async {
+    if (kIsWeb) return;
     if (interval <= 0) return;
     if (tapCount % interval == 0) {
       switch (intensity) {
@@ -27,11 +29,13 @@ class HapticService {
 
   /// Trigger a stronger haptic for milestone events
   static Future<void> triggerMilestoneFeedback() async {
+    if (kIsWeb) return;
     await HapticFeedback.heavyImpact();
   }
 
   /// Trigger feedback for the exit gesture confirmation
   static Future<void> triggerExitReady() async {
+    if (kIsWeb) return;
     await HapticFeedback.mediumImpact();
     await Future.delayed(const Duration(milliseconds: 100));
     await HapticFeedback.mediumImpact();
@@ -39,6 +43,7 @@ class HapticService {
 
   /// Trigger selection click for UI interactions
   static Future<void> triggerSelectionClick() async {
+    if (kIsWeb) return;
     await HapticFeedback.selectionClick();
   }
 }

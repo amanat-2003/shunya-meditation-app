@@ -1,4 +1,5 @@
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,7 +22,10 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: CustomScrollView(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: CustomScrollView(
           slivers: [
             // Header
             SliverToBoxAdapter(
@@ -104,7 +108,8 @@ class SettingsScreen extends ConsumerWidget {
                     _SectionTitle('Meditation'),
                     const SizedBox(height: 12),
 
-                    // Haptic interval
+                    // Haptic interval (hide on web)
+                    if (!kIsWeb)
                     _SettingsCard(
                       icon: Icons.vibration_rounded,
                       title: 'Haptic Feedback Interval',
@@ -138,7 +143,8 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
 
-                    // Haptic intensity
+                    // Haptic intensity (hide on web)
+                    if (!kIsWeb)
                     _SettingsCard(
                       icon: Icons.speed_rounded,
                       title: 'Haptic Intensity',
@@ -492,6 +498,8 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    ),
       ),
     );
   }

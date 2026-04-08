@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="/shunya-meditation-app/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- SEO -->
+  <title>Shunya – Minimalist Meditation & Jaap Tracker</title>
+  <meta name="description" content="Shunya is a minimalist, offline-first meditation and Jaap (mantra) tracker. Track your daily taps, time, streaks, and grow your meditation practice.">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Shunya">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Loading screen styles */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+      overflow: hidden;
+    }
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      background-color: #000000;
+    }
+    .loading-symbol {
+      font-size: 48px;
+      font-weight: 700;
+      color: #FFD54F;
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+    .loading-name {
+      font-size: 18px;
+      font-weight: 300;
+      color: #9E9E9E;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 1s ease-in-out 0.3s forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading screen shown while Flutter engine initializes -->
+  <div class="loading-container" id="loading">
+    <div class="loading-symbol">शून्य</div>
+    <div class="loading-name">Shunya</div>
+  </div>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
