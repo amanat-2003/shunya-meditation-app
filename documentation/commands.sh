@@ -207,7 +207,7 @@ DART_DEFINES_IOS_FULL="$DART_DEFINES_IOS --dart-define=APPLE_SIGN_IN_ENABLED=$AP
 # cd ios && pod deintegrate && pod install --repo-update && cd ..
 
 # Reset Hive data (clear app data on device)
-# Android: adb shell pm clear com.shunya.shunya
+# Android: adb shell pm clear com.anamiapps.shunya
 # iOS: Delete and reinstall the app
 
 

@@ -76,7 +76,7 @@ You need **two** sets of credentials:
 
 **For Android:**
 - Application type: **Android**
-- Package name: `com.shunya.shunya`
+- Package name: `com.anamiapps.shunya`
 - SHA-1 fingerprint:
   ```bash
   # Debug keystore (for development)
@@ -88,7 +88,7 @@ You need **two** sets of credentials:
 
 **For iOS:**
 - Application type: **iOS**
-- Bundle ID: `com.shunya.shunya`
+- Bundle ID: `com.anamiapps.shunya`
 
 **For Web (required for Supabase OAuth flow):**
 - Application type: **Web application**
@@ -114,7 +114,7 @@ You need **two** sets of credentials:
 Only needed when building for iOS App Store:
 
 1. Go to [Apple Developer Portal](https://developer.apple.com/account/resources/identifiers/list) → Identifiers
-2. Enable **Sign in with Apple** for your App ID (`com.shunya.shunya`)
+2. Enable **Sign in with Apple** for your App ID (`com.anamiapps.shunya`)
 3. Create a **Services ID** for web-based redirect
 4. Configure the redirect URL in Supabase Dashboard → Auth → Providers → Apple
 5. Pass the flag when building:
