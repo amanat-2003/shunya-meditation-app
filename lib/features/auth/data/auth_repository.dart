@@ -19,11 +19,11 @@ class AuthRepository {
   Future<AuthResponse?> signInWithGoogle() async {
     if (kIsWeb) {
       // On web, use Supabase OAuth redirect flow.
-      // We pass null for redirectTo so Supabase dynamically infers the current URL
-      // (which correctly includes the /shunya-meditation-app/ path).
+      // Explicitly pass Uri.base.toString() which resolves to the <base href> tag
+      // (e.g. /shunya-meditation-app/) to fix Safari stripping the path.
       await _client.auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: null,
+        redirectTo: Uri.base.toString(),
       );
       // OAuth redirect — won't return an AuthResponse immediately
       return null;
@@ -78,7 +78,7 @@ class AuthRepository {
     try {
       await _client.auth.signInWithOAuth(
         OAuthProvider.apple,
-        redirectTo: kIsWeb ? null : 'com.anamiapps.shunya://login-callback/',
+        redirectTo: kIsWeb ? Uri.base.toString() : 'com.anamiapps.shunya://login-callback/',
       );
       return true;
     } catch (e) {
